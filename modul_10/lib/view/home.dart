@@ -3,7 +3,7 @@ import 'package:modul_10/model/game.dart';
 import 'package:modul_10/viewmodel/fetchgame.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   @override
   HomeState createState() => HomeState();

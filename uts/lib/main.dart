@@ -9,7 +9,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
 
 // ============= MAIN NAVIGATION =============
 class MainApp extends StatefulWidget {
-  const MainApp({Key? key}) : super(key: key);
+  const MainApp({super.key});
 
   @override
   State<MainApp> createState() => _MainAppState();

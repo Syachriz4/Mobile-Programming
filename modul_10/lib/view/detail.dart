@@ -5,7 +5,7 @@ import 'package:readmore/readmore.dart';
 
 class Detail extends StatelessWidget {
   final int gameTerpilih;
-  const Detail({Key? key, required this.gameTerpilih}) : super(key: key);
+  const Detail({super.key, required this.gameTerpilih});
   
   Future<DetailGame> fetchData() async {
     final jsonData = await fetchDataFromAPI(gameTerpilih);

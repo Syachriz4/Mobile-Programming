@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class RunningPage extends StatefulWidget {
-  const RunningPage({Key? key}) : super(key: key);
+  const RunningPage({super.key});
 
   @override
   State<RunningPage> createState() => _RunningPageState();
 }
 
 class _RunningPageState extends State<RunningPage> {
-  int _elapsedSeconds = 3940; // 1 hour 5 minutes 40 seconds
+  final int _elapsedSeconds = 3940; // 1 hour 5 minutes 40 seconds
   bool _isRunning = true;
 
   @override

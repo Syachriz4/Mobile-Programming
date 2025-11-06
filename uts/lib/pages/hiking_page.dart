@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class HikingPage extends StatefulWidget {
-  const HikingPage({Key? key}) : super(key: key);
+  const HikingPage({super.key});
 
   @override
   State<HikingPage> createState() => _HikingPageState();
 }
 
 class _HikingPageState extends State<HikingPage> {
-  int _elapsedSeconds = 5400; // 1 hour 30 minutes
+  final int _elapsedSeconds = 5400; // 1 hour 30 minutes
   bool _isRunning = true;
 
   @override

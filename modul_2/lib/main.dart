@@ -6,6 +6,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -46,6 +48,8 @@ class MyApp extends StatelessWidget {
 }
 
 class KotakBiruJempol extends StatelessWidget {
+  const KotakBiruJempol({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -72,6 +76,8 @@ class KotakBiruJempol extends StatelessWidget {
 }
 
 class KotakBiruJempol1 extends StatelessWidget {
+  const KotakBiruJempol1({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -98,6 +104,8 @@ class KotakBiruJempol1 extends StatelessWidget {
 }
 
 class KotakBiruJempol2 extends StatelessWidget {
+  const KotakBiruJempol2({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -124,6 +132,8 @@ class KotakBiruJempol2 extends StatelessWidget {
 }
 
 class KotakBiruJempol3 extends StatelessWidget {
+  const KotakBiruJempol3({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(

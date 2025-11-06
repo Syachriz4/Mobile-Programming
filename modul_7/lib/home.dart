@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'tujuan.dart';
 
 class Home extends StatelessWidget {
   const Home({super.key});
