@@ -1,7 +1,30 @@
 import 'package:flutter/material.dart';
+import '../models/activity_model.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String _selectedFilter = 'All';
+  List<Activity> _activities = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadActivities();
+  }
+
+  Future<void> _loadActivities() async {
+    // Placeholder untuk real implementation
+    // Akan load dari shared preferences atau database
+    setState(() {
+      _activities = [];
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,37 +45,40 @@ class ProfilePage extends StatelessWidget {
                   child: Column(
                     children: [
                       CircleAvatar(
-                        radius: 40,
+                        radius: 50,
                         backgroundColor: const Color(0xFF6366F1),
                         child: const Text(
-                          '--',
+                          'AS',
                           style: TextStyle(
-                            fontSize: 26,
+                            fontSize: 28,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'User Profile',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const Text(
-                        'Loading profile...',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
+                      const SizedBox(height: 16),
+                      // Edit Profile Button
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          // TODO: Navigate to edit profile
+                        },
+                        icon: const Icon(Icons.edit, size: 18),
+                        label: const Text('Edit Profile'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6366F1),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 10,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
                 // Statistics Section
                 const Text(
@@ -71,16 +97,16 @@ class ProfilePage extends StatelessWidget {
                   crossAxisSpacing: 10,
                   childAspectRatio: 1.1,
                   children: [
-                    _buildStatCard('🏃', '--', 'km Run'),
-                    _buildStatCard('⛰️', '--', 'km Hike'),
-                    _buildStatCard('🔥', '--', 'kcal'),
+                    _buildStatCard('🏃', '0.0', 'km Run'),
+                    _buildStatCard('⛰️', '0.0', 'km Hike'),
+                    _buildStatCard('🔥', '0', 'kcal'),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 32),
 
-                // Menu Section
+                // Saved Activities Section
                 const Text(
-                  'MENU',
+                  'SAVED ACTIVITIES',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -88,11 +114,78 @@ class ProfilePage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _buildMenuItem('⚙️', 'Personal Parameters'),
-                _buildMenuItem('🏆', 'Achievements'),
-                _buildMenuItem('📚', 'Islamic Content'),
-                _buildMenuItem('🔧', 'Settings'),
-                _buildMenuItem('📞', 'Contact & Support'),
+
+                // Search Bar
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.1),
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search activities (type, date, distance)...',
+                      hintStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.6),
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: Colors.grey.withOpacity(0.6),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Filter Tabs
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildFilterChip('All'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('⚡ Running'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('⛰️ Hiking'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Activities List or Empty State
+                if (_activities.isEmpty)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 40),
+                      child: Text(
+                        'No activities yet',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: _activities.length,
+                    itemBuilder: (context, index) {
+                      // TODO: Build activity list item
+                      return const SizedBox();
+                    },
+                  ),
+
                 const SizedBox(height: 20),
               ]),
             ),
@@ -140,40 +233,39 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // Helper method to build menu item
-  Widget _buildMenuItem(String icon, String title) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.indigo.withOpacity(0.1),
-        border: Border.all(color: Colors.indigo.withOpacity(0.2)),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Text(
-            icon,
-            style: const TextStyle(fontSize: 20),
+  // Helper method to build filter chip
+  Widget _buildFilterChip(String label) {
+    final isSelected = _selectedFilter == label;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedFilter = label;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF6366F1)
+              : Colors.white.withOpacity(0.05),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF6366F1)
+                : Colors.white.withOpacity(0.1),
           ),
-          const SizedBox(width: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: Colors.white,
-            ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey,
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
           ),
-          const Spacer(),
-          const Text(
-            '›',
-            style: TextStyle(
-              color: Colors.grey,
-              fontSize: 18,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
