@@ -1,5 +1,5 @@
-import '../models/weather_model.dart';
-import 'weather_service.dart';
+﻿import '../models/weather_model.dart';
+import '../services/weather_service.dart';
 
 class WeatherRepository {
   final WeatherService _weatherService = WeatherService();
@@ -9,16 +9,16 @@ class WeatherRepository {
   }
 
   String getWeatherEmoji(int weatherCode) {
-    if (weatherCode == 0) return '☀️';
-    if (weatherCode == 1 || weatherCode == 2) return '⛅';
-    if (weatherCode == 3) return '☁️';
-    if (weatherCode >= 45 && weatherCode <= 48) return '🌫️';
-    if (weatherCode >= 51 && weatherCode <= 67) return '🌧️';
-    if (weatherCode >= 80 && weatherCode <= 82) return '🌧️';
-    if (weatherCode >= 85 && weatherCode <= 86) return '🌨️';
-    if (weatherCode >= 71 && weatherCode <= 77) return '❄️';
-    if (weatherCode >= 80 && weatherCode <= 99) return '⛈️';
-    return '🌤️';
+    if (weatherCode == 0) return 'â˜€ï¸';
+    if (weatherCode == 1 || weatherCode == 2) return 'â›…';
+    if (weatherCode == 3) return 'â˜ï¸';
+    if (weatherCode >= 45 && weatherCode <= 48) return 'ðŸŒ«ï¸';
+    if (weatherCode >= 51 && weatherCode <= 67) return 'ðŸŒ§ï¸';
+    if (weatherCode >= 80 && weatherCode <= 82) return 'ðŸŒ§ï¸';
+    if (weatherCode >= 85 && weatherCode <= 86) return 'ðŸŒ¨ï¸';
+    if (weatherCode >= 71 && weatherCode <= 77) return 'â„ï¸';
+    if (weatherCode >= 80 && weatherCode <= 99) return 'â›ˆï¸';
+    return 'ðŸŒ¤ï¸';
   }
 
   String getWeatherCondition(int code) {
@@ -34,3 +34,4 @@ class WeatherRepository {
     return 'Unknown';
   }
 }
+
