@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     final initials = await UserService.getUserInitials();
     final level = await UserService.getUserLevel();
     final imagePath = await UserService.getUserImagePath();
+    final weeklyGoal = await UserService.getWeeklyGoal();
     
     if (mounted) {
       setState(() {
@@ -42,6 +43,7 @@ class _HomePageState extends State<HomePage> {
         _userInitials = initials;
         _userLevel = level;
         _userImagePath = imagePath;
+        _weeklyGoal = weeklyGoal;
       });
     }
   }
@@ -51,6 +53,88 @@ class _HomePageState extends State<HomePage> {
         await rootBundle.loadString('assets/data/activities.json');
     final List<dynamic> data = jsonDecode(response);
     return data.map((item) => Activity.fromJson(item)).toList();
+  }
+
+  void _showSettingsDialog() {
+    final TextEditingController controller = TextEditingController(
+      text: _weeklyGoal.toStringAsFixed(1),
+    );
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF0F0F1E),
+        title: const Text('Settings'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Weekly Goal (km)',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              style: const TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'Enter weekly goal in km',
+                hintStyle: TextStyle(color: Colors.grey.shade600),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade700),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final newGoal = double.tryParse(controller.text);
+              if (newGoal != null && newGoal > 0) {
+                await UserService.saveWeeklyGoal(newGoal);
+                setState(() {
+                  _weeklyGoal = newGoal;
+                });
+                if (mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Weekly goal updated successfully'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Please enter a valid number'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -110,7 +194,7 @@ class _HomePageState extends State<HomePage> {
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.settings),
-                      onPressed: () {},
+                      onPressed: () => _showSettingsDialog(),
                     ),
                   ],
                 ),

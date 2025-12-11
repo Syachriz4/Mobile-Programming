@@ -5,11 +5,13 @@ class UserService {
   static const String _initialsKey = 'user_initials';
   static const String _levelKey = 'user_level';
   static const String _imagePathKey = 'user_image_path';
+  static const String _weeklyGoalKey = 'weekly_goal';
 
   // Default values
   static const String defaultName = 'Andrew';
   static const String defaultInitials = 'AS';
   static const String defaultLevel = 'Beginner';
+  static const double defaultWeeklyGoal = 50.0;
 
   // Get user name
   static Future<String> getUserName() async {
@@ -33,6 +35,12 @@ class UserService {
   static Future<String?> getUserImagePath() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_imagePathKey);
+  }
+
+  // Get weekly goal
+  static Future<double> getWeeklyGoal() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(_weeklyGoalKey) ?? defaultWeeklyGoal;
   }
 
   // Save user name
@@ -60,6 +68,12 @@ class UserService {
       return prefs.remove(_imagePathKey);
     }
     return prefs.setString(_imagePathKey, imagePath);
+  }
+
+  // Save weekly goal
+  static Future<bool> saveWeeklyGoal(double goal) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.setDouble(_weeklyGoalKey, goal);
   }
 
   // Save all user data at once
