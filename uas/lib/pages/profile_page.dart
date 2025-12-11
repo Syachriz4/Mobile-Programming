@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/activity_model.dart';
+import 'edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -11,6 +12,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String _selectedFilter = 'All';
   List<Activity> _activities = [];
+  String _userName = 'User';
+  String _userInitials = '--';
 
   @override
   void initState() {
@@ -47,9 +50,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: const Color(0xFF6366F1),
-                        child: const Text(
-                          'AS',
-                          style: TextStyle(
+                        child: Text(
+                          _userInitials,
+                          style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
@@ -57,10 +60,34 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      // User Name Display
+                      Text(
+                        _userName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       // Edit Profile Button
                       ElevatedButton.icon(
-                        onPressed: () {
-                          // TODO: Navigate to edit profile
+                        onPressed: () async {
+                          final result = await Navigator.push<Map<String, dynamic>>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditProfilePage(
+                                initialName: _userName,
+                              ),
+                            ),
+                          );
+
+                          if (result != null) {
+                            setState(() {
+                              _userName = result['name'] ?? _userName;
+                              _userInitials = result['initials'] ?? _userInitials;
+                            });
+                          }
                         },
                         icon: const Icon(Icons.edit, size: 18),
                         label: const Text('Edit Profile'),
