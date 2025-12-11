@@ -22,6 +22,8 @@ class _HomePageState extends State<HomePage> {
   String? _userImagePath;
   double _weeklyGoal = 50.0; // km
   double _weeklyProgress = 0.0; // km done
+  String _selectedFilter = 'All';
+  String _searchQuery = '';
 
   @override
   void initState() {
@@ -53,6 +55,63 @@ class _HomePageState extends State<HomePage> {
         await rootBundle.loadString('assets/data/activities.json');
     final List<dynamic> data = jsonDecode(response);
     return data.map((item) => Activity.fromJson(item)).toList();
+  }
+
+  List<Activity> _filterActivities(List<Activity> activities) {
+    var filtered = activities;
+
+    // Apply filter
+    if (_selectedFilter == '⚡ Running') {
+      filtered = filtered.where((a) => a.type == 'Running').toList();
+    } else if (_selectedFilter == '⛰️ Hiking') {
+      filtered = filtered.where((a) => a.type == 'Hiking').toList();
+    }
+
+    // Apply search
+    if (_searchQuery.isNotEmpty) {
+      filtered = filtered.where((a) {
+        return a.type.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            a.date.toLowerCase().contains(_searchQuery.toLowerCase());
+      }).toList();
+    }
+
+    return filtered;
+  }
+
+  Widget _buildFilterChip(String label) {
+    final isSelected = _selectedFilter == label;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedFilter = label;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? const Color(0xFF6366F1)
+              : Colors.white.withOpacity(0.05),
+          border: Border.all(
+            color: isSelected
+                ? const Color(0xFF6366F1)
+                : Colors.white.withOpacity(0.1),
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey,
+            fontSize: 13,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+      ),
+    );
   }
 
   void _showSettingsDialog() {
@@ -215,6 +274,49 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 12),
 
+                // Search Bar
+                TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                  style: const TextStyle(color: Colors.white),
+                  decoration: InputDecoration(
+                    hintText: 'Search activities...',
+                    hintStyle: TextStyle(color: Colors.grey.shade600),
+                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade700),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.grey.shade700),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Filter Tabs
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildFilterChip('All'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('⚡ Running'),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('⛰️ Hiking'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
                 // Activity List with FutureBuilder
                 FutureBuilder<List<Activity>>(
                   future: _activities,
@@ -243,12 +345,31 @@ class _HomePageState extends State<HomePage> {
                       );
                     }
 
+                    final filteredActivities = _filterActivities(snapshot.data!);
+
+                    if (filteredActivities.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Center(
+                          child: Text(
+                            _searchQuery.isNotEmpty
+                                ? 'No activities match your search'
+                                : 'No activities for this filter',
+                            style: const TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+
                     return ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: snapshot.data!.length,
+                      itemCount: filteredActivities.length,
                       itemBuilder: (context, index) {
-                        final activity = snapshot.data![index];
+                        final activity = filteredActivities[index];
                         return ActivityCard(activity: activity);
                       },
                     );
