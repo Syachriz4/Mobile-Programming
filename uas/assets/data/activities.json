@@ -1,0 +1,49 @@
+[
+  {
+    "id": "1",
+    "type": "running",
+    "distance": 10.12,
+    "duration": 3240,
+    "calories": 201,
+    "speed": 11.2,
+    "date": "Nov 20, 2024"
+  },
+  {
+    "id": "2",
+    "type": "hiking",
+    "distance": 9.89,
+    "duration": 5400,
+    "calories": 469,
+    "speed": 6.6,
+    "date": "Nov 19, 2024",
+    "elevation": 1250
+  },
+  {
+    "id": "3",
+    "type": "running",
+    "distance": 5.43,
+    "duration": 1980,
+    "calories": 127,
+    "speed": 9.9,
+    "date": "Nov 18, 2024"
+  },
+  {
+    "id": "4",
+    "type": "hiking",
+    "distance": 12.5,
+    "duration": 6300,
+    "calories": 587,
+    "speed": 7.1,
+    "date": "Nov 17, 2024",
+    "elevation": 1580
+  },
+  {
+    "id": "5",
+    "type": "running",
+    "distance": 8.34,
+    "duration": 2520,
+    "calories": 184,
+    "speed": 11.9,
+    "date": "Nov 16, 2024"
+  }
+]
