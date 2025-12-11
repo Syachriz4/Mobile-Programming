@@ -14,6 +14,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<List<Activity>> _activities;
+  String _userName = 'Andrew';
+  String _userLevel = 'Beginner';
+  String _userInitials = 'AS';
+  double _weeklyGoal = 50.0; // km
+  double _weeklyProgress = 0.0; // km done
 
   @override
   void initState() {
@@ -48,29 +53,29 @@ class _HomePageState extends State<HomePage> {
                     CircleAvatar(
                       radius: 24,
                       backgroundColor: const Color(0xFF6366F1),
-                      child: const Text(
-                        '--',
-                        style: TextStyle(
+                      child: Text(
+                        _userInitials,
+                        style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    const Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, User',
-                          style: TextStyle(
+                          'Hello, $_userName',
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
                         Text(
-                          'Loading profile...',
-                          style: TextStyle(
+                          _userLevel,
+                          style: const TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
                           ),
@@ -115,7 +120,18 @@ class _HomePageState extends State<HomePage> {
                     }
 
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Text('No activities found');
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 20),
+                        child: Center(
+                          child: Text(
+                            'No activities found',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      );
                     }
 
                     return ListView.builder(
@@ -167,9 +183,9 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '-- km',
-                style: TextStyle(
+              Text(
+                '${_weeklyGoal.toStringAsFixed(1)} km',
+                style: const TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -188,7 +204,7 @@ class _HomePageState extends State<HomePage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(3),
             child: LinearProgressIndicator(
-              value: 0.0,
+              value: _weeklyProgress / _weeklyGoal,
               minHeight: 6,
               backgroundColor: Colors.white.withOpacity(0.1),
               valueColor: AlwaysStoppedAnimation(
@@ -197,19 +213,19 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 10),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '✅ -- km done',
-                style: TextStyle(
+                '✅ ${_weeklyProgress.toStringAsFixed(1)} km done',
+                style: const TextStyle(
                   fontSize: 13,
                   color: Colors.grey,
                 ),
               ),
               Text(
-                '-- km left',
-                style: TextStyle(
+                '${(_weeklyGoal - _weeklyProgress).toStringAsFixed(1)} km left',
+                style: const TextStyle(
                   fontSize: 13,
                   color: Colors.grey,
                 ),
