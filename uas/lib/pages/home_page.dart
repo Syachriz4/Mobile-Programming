@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import '../models/activity_model.dart';
+import '../services/user_service.dart';
 import '../widgets/activity_card.dart';
 
 
@@ -24,6 +25,21 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _activities = loadActivities();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final name = await UserService.getUserName();
+    final initials = await UserService.getUserInitials();
+    final level = await UserService.getUserLevel();
+    
+    if (mounted) {
+      setState(() {
+        _userName = name;
+        _userInitials = initials;
+        _userLevel = level;
+      });
+    }
   }
 
   Future<List<Activity>> loadActivities() async {

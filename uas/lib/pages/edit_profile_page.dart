@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../services/user_service.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String initialName;
@@ -95,10 +96,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     });
 
     try {
-      // Simulate save delay
-      await Future.delayed(const Duration(milliseconds: 500));
+      // Save to SharedPreferences
+      await UserService.saveUserData(
+        name: _nameController.text,
+        initials: _avatarInitialsController.text,
+        imagePath: _selectedImage?.path,
+      );
 
-      // TODO: Save to SharedPreferences or Database
       if (mounted) {
         Navigator.pop(context, {
           'name': _nameController.text,

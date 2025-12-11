@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/activity_model.dart';
+import '../services/user_service.dart';
 import 'edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -18,7 +19,20 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    _loadUserData();
     _loadActivities();
+  }
+
+  Future<void> _loadUserData() async {
+    final name = await UserService.getUserName();
+    final initials = await UserService.getUserInitials();
+    
+    if (mounted) {
+      setState(() {
+        _userName = name;
+        _userInitials = initials;
+      });
+    }
   }
 
   Future<void> _loadActivities() async {
