@@ -49,7 +49,7 @@ class _HomePageState extends State<HomePage> {
                       radius: 24,
                       backgroundColor: const Color(0xFF6366F1),
                       child: const Text(
-                        'AS',
+                        '--',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Hello, Andrew',
+                          'Hello, User',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         Text(
-                          'Beginner',
+                          'Loading profile...',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey,
@@ -168,7 +168,7 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                '50 km',
+                '-- km',
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.w700,
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(3),
             child: LinearProgressIndicator(
-              value: 0.7,
+              value: 0.0,
               minHeight: 6,
               backgroundColor: Colors.white.withOpacity(0.1),
               valueColor: AlwaysStoppedAnimation(
@@ -197,18 +197,18 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const SizedBox(height: 10),
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
+            children: [
               Text(
-                '✅ 35 km done',
+                '✅ -- km done',
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.grey,
                 ),
               ),
               Text(
-                '15 km left',
+                '-- km left',
                 style: TextStyle(
                   fontSize: 13,
                   color: Colors.grey,

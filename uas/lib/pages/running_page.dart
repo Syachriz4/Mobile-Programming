@@ -8,8 +8,13 @@ class RunningPage extends StatefulWidget {
 }
 
 class _RunningPageState extends State<RunningPage> {
-  final int _elapsedSeconds = 3940; // 1 hour 5 minutes 40 seconds
-  bool _isRunning = true;
+  int _elapsedSeconds = 0;
+  bool _isRunning = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,17 +68,18 @@ class _RunningPageState extends State<RunningPage> {
               ),
               child: const Center(
                 child: Text(
-                  '🗺️ Map Preview',
+                  '🗺️ Map Preview\n(Coming Soon)',
                   style: TextStyle(
                     color: Colors.indigo,
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
             const SizedBox(height: 16),
 
-            // Stats Grid (3 columns)
+            // Stats Grid (Empty state)
             GridView.count(
               crossAxisCount: 3,
               shrinkWrap: true,
@@ -81,9 +87,9 @@ class _RunningPageState extends State<RunningPage> {
               crossAxisSpacing: 10,
               childAspectRatio: 1.2,
               children: [
-                _buildStatBox('👟', '10.9', 'km'),
-                _buildStatBox('🔥', '539', 'kcal'),
-                _buildStatBox('⚡', '12.3', 'km/h'),
+                _buildStatBox('👟', '--', 'km'),
+                _buildStatBox('🔥', '--', 'kcal'),
+                _buildStatBox('⚡', '--', 'km/h'),
               ],
             ),
             const SizedBox(height: 20),
@@ -122,10 +128,10 @@ class _RunningPageState extends State<RunningPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.all(12),
-              child: Column(
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '⏰ PRAYER REMINDER',
                     style: TextStyle(
                       fontSize: 12,
@@ -133,18 +139,18 @@ class _RunningPageState extends State<RunningPage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Asr prayer in 45 minutes',
+                  SizedBox(height: 6),
+                  Text(
+                    'Start running to receive prayer reminders',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Location: 6°14\'42"S',
+                  SizedBox(height: 6),
+                  Text(
+                    'Location: Waiting for GPS...',
                     style: TextStyle(
                       fontSize: 11,
                       color: Colors.grey,

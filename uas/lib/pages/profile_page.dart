@@ -25,7 +25,7 @@ class ProfilePage extends StatelessWidget {
                         radius: 40,
                         backgroundColor: const Color(0xFF6366F1),
                         child: const Text(
-                          'AS',
+                          '--',
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w600,
@@ -35,7 +35,7 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       const Text(
-                        'Andrew Sinclair',
+                        'User Profile',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
@@ -43,7 +43,7 @@ class ProfilePage extends StatelessWidget {
                         ),
                       ),
                       const Text(
-                        'Beginner • Level 5',
+                        'Loading profile...',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey,
@@ -71,9 +71,9 @@ class ProfilePage extends StatelessWidget {
                   crossAxisSpacing: 10,
                   childAspectRatio: 1.1,
                   children: [
-                    _buildStatCard('🏃', '45.5', 'km Run'),
-                    _buildStatCard('⛰️', '38.9', 'km Hike'),
-                    _buildStatCard('🔥', '4,200', 'kcal'),
+                    _buildStatCard('🏃', '--', 'km Run'),
+                    _buildStatCard('⛰️', '--', 'km Hike'),
+                    _buildStatCard('🔥', '--', 'kcal'),
                   ],
                 ),
                 const SizedBox(height: 24),

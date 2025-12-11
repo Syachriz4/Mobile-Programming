@@ -8,8 +8,13 @@ class HikingPage extends StatefulWidget {
 }
 
 class _HikingPageState extends State<HikingPage> {
-  final int _elapsedSeconds = 5400; // 1 hour 30 minutes
-  bool _isRunning = true;
+  int _elapsedSeconds = 0;
+  bool _isRunning = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,11 +68,12 @@ class _HikingPageState extends State<HikingPage> {
               ),
               child: const Center(
                 child: Text(
-                  '🗺️ Map Preview',
+                  '🗺️ Map Preview\n(Coming Soon)',
                   style: TextStyle(
                     color: Colors.purple,
-                    fontSize: 18,
+                    fontSize: 16,
                   ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
@@ -81,9 +87,9 @@ class _HikingPageState extends State<HikingPage> {
               crossAxisSpacing: 10,
               childAspectRatio: 1.2,
               children: [
-                _buildStatBox('⛏️', '1,250', 'm'),
-                _buildStatBox('🔥', '469', 'kcal'),
-                _buildStatBox('⚡', '6.6', 'km/h'),
+                _buildStatBox('⛏️', '--', 'm'),
+                _buildStatBox('🔥', '--', 'kcal'),
+                _buildStatBox('⚡', '--', 'km/h'),
               ],
             ),
             const SizedBox(height: 20),
@@ -122,10 +128,10 @@ class _HikingPageState extends State<HikingPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.all(12),
-              child: Column(
+              child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     '📿 DZIKIR REMINDER',
                     style: TextStyle(
                       fontSize: 12,
@@ -133,9 +139,9 @@ class _HikingPageState extends State<HikingPage> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Subhanallah at the peak',
+                  SizedBox(height: 6),
+                  Text(
+                    'Start hiking to receive dzikir reminders',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.white,
@@ -143,9 +149,9 @@ class _HikingPageState extends State<HikingPage> {
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    'Mount Bromo • 1,250m elevation',
+                  SizedBox(height: 6),
+                  Text(
+                    'Elevation: Waiting for GPS data...',
                     style: TextStyle(
                       fontSize: 11,
                       color: Colors.grey,
