@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../models/activity_model.dart';
 import '../services/user_service.dart';
 import 'edit_profile_page.dart';
@@ -15,6 +16,7 @@ class _ProfilePageState extends State<ProfilePage> {
   List<Activity> _activities = [];
   String _userName = 'User';
   String _userInitials = '--';
+  String? _userImagePath;
 
   @override
   void initState() {
@@ -26,11 +28,13 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _loadUserData() async {
     final name = await UserService.getUserName();
     final initials = await UserService.getUserInitials();
+    final imagePath = await UserService.getUserImagePath();
     
     if (mounted) {
       setState(() {
         _userName = name;
         _userInitials = initials;
+        _userImagePath = imagePath;
       });
     }
   }
@@ -64,14 +68,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       CircleAvatar(
                         radius: 50,
                         backgroundColor: const Color(0xFF6366F1),
-                        child: Text(
-                          _userInitials,
-                          style: const TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                        backgroundImage: _userImagePath != null && File(_userImagePath!).existsSync()
+                            ? FileImage(File(_userImagePath!))
+                            : null,
+                        child: _userImagePath != null && File(_userImagePath!).existsSync()
+                            ? null
+                            : Text(
+                                _userInitials,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                       const SizedBox(height: 16),
                       // User Name Display
@@ -100,6 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             setState(() {
                               _userName = result['name'] ?? _userName;
                               _userInitials = result['initials'] ?? _userInitials;
+                              _userImagePath = result['imagePath'] ?? _userImagePath;
                             });
                           }
                         },

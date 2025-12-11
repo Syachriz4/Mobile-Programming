@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
+import 'dart:io';
 import '../models/activity_model.dart';
 import '../services/user_service.dart';
 import '../widgets/activity_card.dart';
@@ -18,6 +19,7 @@ class _HomePageState extends State<HomePage> {
   String _userName = 'Andrew';
   String _userLevel = 'Beginner';
   String _userInitials = 'AS';
+  String? _userImagePath;
   double _weeklyGoal = 50.0; // km
   double _weeklyProgress = 0.0; // km done
 
@@ -32,12 +34,14 @@ class _HomePageState extends State<HomePage> {
     final name = await UserService.getUserName();
     final initials = await UserService.getUserInitials();
     final level = await UserService.getUserLevel();
+    final imagePath = await UserService.getUserImagePath();
     
     if (mounted) {
       setState(() {
         _userName = name;
         _userInitials = initials;
         _userLevel = level;
+        _userImagePath = imagePath;
       });
     }
   }
@@ -69,13 +73,18 @@ class _HomePageState extends State<HomePage> {
                     CircleAvatar(
                       radius: 24,
                       backgroundColor: const Color(0xFF6366F1),
-                      child: Text(
-                        _userInitials,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      backgroundImage: _userImagePath != null && File(_userImagePath!).existsSync()
+                          ? FileImage(File(_userImagePath!))
+                          : null,
+                      child: _userImagePath != null && File(_userImagePath!).existsSync()
+                          ? null
+                          : Text(
+                              _userInitials,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                     const SizedBox(width: 12),
                     Column(
