@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
-import '../models/activity_model.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/tracking_session_model.dart';
 import '../services/user_service.dart';
 import '../services/tracking_service.dart';
@@ -117,6 +118,122 @@ class _ProfilePageState extends State<ProfilePage> {
       default:
         return '🌱';
     }
+  }
+
+  void _showEditSessionDialog(TrackingSession session) {
+    final nameController = TextEditingController(text: session.name);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF0F0F1E),
+        title: Text(
+          'Edit ${session.type} Session',
+          style: const TextStyle(color: Colors.white),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Session Name Field
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: 'Session Name',
+                  labelStyle: const TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFF6366F1)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide(color: Colors.grey.shade700),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(color: Color(0xFF6366F1), width: 2),
+                  ),
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              
+              // Display tracking data as read-only
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade900,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Distance: ${session.distance.toStringAsFixed(2)} km',
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Speed: ${session.speed.toStringAsFixed(2)} km/h',
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Calories: ${session.calories} kcal',
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                    ),
+                    if (session.elevation != null) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        'Elevation: ${session.elevation!.toStringAsFixed(0)} m',
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'These values are calculated from GPS tracking and cannot be edited.',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          TextButton(
+            onPressed: () async {
+              // Update session name
+              session.name = nameController.text;
+              
+              // Save updated session
+              final allSessions = await TrackingService.getAllSessions();
+              final index = allSessions.indexWhere((s) => s.id == session.id);
+              if (index != -1) {
+                allSessions[index] = session;
+                
+                // Save all sessions
+                final jsonList = allSessions
+                    .map((s) => jsonEncode(s.toJson()))
+                    .toList();
+                final prefs = await SharedPreferences.getInstance();
+                await prefs.setStringList('tracking_sessions', jsonList);
+              }
+              
+              if (mounted) {
+                Navigator.pop(context);
+                _loadTrackingSessions();
+              }
+            },
+            child: const Text('Save', style: TextStyle(color: Color(0xFF6366F1))),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _deleteSession(String sessionId) async {
@@ -429,7 +546,7 @@ class _ProfilePageState extends State<ProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${session.type} Session',
+              session.name.isNotEmpty ? session.name : '${session.type} Session',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -448,21 +565,50 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
         subtitle: Padding(
           padding: const EdgeInsets.only(top: 8),
-          child: Row(
-            children: [
-              _buildInfoChip('📍 $distanceText km'),
-              const SizedBox(width: 8),
-              _buildInfoChip('⏱️ $durationText'),
-              const SizedBox(width: 8),
-              _buildInfoChip('⚡ $speedText km/h'),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildInfoChip('📍 $distanceText km'),
+                const SizedBox(width: 8),
+                _buildInfoChip('⏱️ $durationText'),
+                const SizedBox(width: 8),
+                _buildInfoChip('⚡ $speedText km/h'),
+              ],
+            ),
           ),
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red, size: 20),
-          onPressed: () {
-            _deleteSession(session.id);
+        trailing: PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == 'edit') {
+              _showEditSessionDialog(session);
+            } else if (value == 'delete') {
+              _deleteSession(session.id);
+            }
           },
+          itemBuilder: (BuildContext context) => [
+            const PopupMenuItem(
+              value: 'edit',
+              child: Row(
+                children: [
+                  Icon(Icons.edit, size: 18, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Text('Edit'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'delete',
+              child: Row(
+                children: [
+                  Icon(Icons.delete, size: 18, color: Colors.red),
+                  SizedBox(width: 8),
+                  Text('Delete'),
+                ],
+              ),
+            ),
+          ],
+          icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
         ),
       ),
     );

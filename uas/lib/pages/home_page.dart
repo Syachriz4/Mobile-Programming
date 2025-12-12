@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'dart:convert';
 import 'dart:io';
-import '../models/activity_model.dart';
+import '../models/tracking_session_model.dart';
 import '../services/user_service.dart';
-import '../widgets/activity_card.dart';
+import '../services/tracking_service.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -15,7 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late Future<List<Activity>> _activities;
+  List<TrackingSession> _allActivities = [];
   String _userName = 'Andrew';
   String _userLevel = 'Beginner';
   String _userInitials = 'AS';
@@ -28,8 +26,21 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _activities = loadActivities();
+    _loadActivities();
     _loadUserData();
+  }
+
+  Future<void> _loadActivities() async {
+    final activities = await TrackingService.getAllSessions();
+    if (mounted) {
+      setState(() {
+        // Sort by start time (newest first)
+        activities.sort((a, b) => b.startTime.compareTo(a.startTime));
+        _allActivities = activities;
+        // Calculate weekly progress
+        _weeklyProgress = activities.fold(0, (sum, session) => sum + session.distance);
+      });
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -50,19 +61,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<List<Activity>> loadActivities() async {
-    try {
-      final String response =
-          await rootBundle.loadString('assets/data/activities.json');
-      final List<dynamic> data = jsonDecode(response);
-      return data.map((item) => Activity.fromJson(item)).toList();
-    } catch (e) {
-      print('Error loading activities: $e');
-      return [];
-    }
-  }
-
-  List<Activity> _filterActivities(List<Activity> activities) {
+  List<TrackingSession> _filterActivities(List<TrackingSession> activities) {
     var filtered = activities;
 
     // Apply filter
@@ -75,8 +74,12 @@ class _HomePageState extends State<HomePage> {
     // Apply search
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((a) {
-        return a.type.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            a.date.toLowerCase().contains(_searchQuery.toLowerCase());
+        final typeLower = a.type.toLowerCase();
+        final dateLower = a.startTime.toString().toLowerCase();
+        final nameLower = a.name.toLowerCase();
+        return typeLower.contains(_searchQuery.toLowerCase()) ||
+            dateLower.contains(_searchQuery.toLowerCase()) ||
+            nameLower.contains(_searchQuery.toLowerCase());
       }).toList();
     }
 
@@ -117,6 +120,105 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Widget _buildSessionCard(TrackingSession session) {
+    final durationText = session.formattedDuration;
+    final dateText = _formatDate(session.startTime);
+    final distanceText = session.distance.toStringAsFixed(2);
+    final speedText = session.speed.toStringAsFixed(2);
+    final typeEmoji = session.type == 'Running' ? '⚡' : '⛰️';
+    final typeColor = session.type == 'Running' 
+        ? Colors.indigo.withOpacity(0.2)
+        : Colors.purple.withOpacity(0.2);
+    
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: typeColor,
+        border: Border.all(
+          color: session.type == 'Running' 
+              ? Colors.indigo.withOpacity(0.3)
+              : Colors.purple.withOpacity(0.3),
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.all(12),
+        leading: Text(
+          typeEmoji,
+          style: const TextStyle(fontSize: 24),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              session.name.isNotEmpty ? session.name : '${session.type} Session',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              dateText,
+              style: TextStyle(
+                color: Colors.grey.withOpacity(0.8),
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildInfoChip('📍 $distanceText km'),
+                const SizedBox(width: 8),
+                _buildInfoChip('⏱️ $durationText'),
+                const SizedBox(width: 8),
+                _buildInfoChip('⚡ $speedText km/h'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.grey,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+
+  String _formatDate(DateTime dateTime) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final date = DateTime(dateTime.year, dateTime.month, dateTime.day);
+    
+    if (date == today) {
+      return 'Today at ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    } else if (date == yesterday) {
+      return 'Yesterday at ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    } else {
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+    }
   }
 
   void _showSettingsDialog() {
@@ -322,21 +424,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 16),
 
-                // Activity List with FutureBuilder
-                FutureBuilder<List<Activity>>(
-                  future: _activities,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SizedBox(
-                        height: 100,
-                        child: Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    }
-
-                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Padding(
+                // Activity List
+                _allActivities.isEmpty
+                    ? const Padding(
                         padding: EdgeInsets.symmetric(vertical: 20),
                         child: Center(
                           child: Text(
@@ -347,39 +437,39 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                         ),
-                      );
-                    }
+                      )
+                    : Builder(
+                        builder: (context) {
+                          final filteredActivities = _filterActivities(_allActivities);
 
-                    final filteredActivities = _filterActivities(snapshot.data!);
+                          if (filteredActivities.isEmpty) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              child: Center(
+                                child: Text(
+                                  _searchQuery.isNotEmpty
+                                      ? 'No activities match your search'
+                                      : 'No activities for this filter',
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
 
-                    if (filteredActivities.isEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Center(
-                          child: Text(
-                            _searchQuery.isNotEmpty
-                                ? 'No activities match your search'
-                                : 'No activities for this filter',
-                            style: const TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: filteredActivities.length,
-                      itemBuilder: (context, index) {
-                        final activity = filteredActivities[index];
-                        return ActivityCard(activity: activity);
-                      },
-                    );
-                  },
-                ),
+                          return ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: filteredActivities.length,
+                            itemBuilder: (context, index) {
+                              final session = filteredActivities[index];
+                              return _buildSessionCard(session);
+                            },
+                          );
+                        },
+                      ),
                 const SizedBox(height: 20),
               ]),
             ),

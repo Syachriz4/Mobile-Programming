@@ -8,6 +8,7 @@ class TrackingSession {
   int calories; // dalam kcal
   double speed; // dalam km/h
   double? elevation; // dalam meter (untuk hiking)
+  String name; // custom session name
   List<Map<String, double>> coordinates; // latitude, longitude points
 
   TrackingSession({
@@ -20,6 +21,7 @@ class TrackingSession {
     this.calories = 0,
     this.speed = 0.0,
     this.elevation,
+    this.name = '',
     this.coordinates = const [],
   });
 
@@ -61,6 +63,7 @@ class TrackingSession {
       calories: json['calories'],
       speed: (json['speed'] as num).toDouble(),
       elevation: json['elevation']?.toDouble(),
+      name: json['name'] ?? '',
       coordinates: List<Map<String, double>>.from(
         (json['coordinates'] as List<dynamic>? ?? []).map(
           (coord) => Map<String, double>.from(coord),
@@ -79,6 +82,7 @@ class TrackingSession {
     'calories': calories,
     'speed': speed,
     'elevation': elevation,
+    'name': name,
     'coordinates': coordinates,
   };
 }

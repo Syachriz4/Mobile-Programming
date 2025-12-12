@@ -52,6 +52,11 @@ class _MainAppState extends State<MainApp> {
       _selectedIndex = index;
     });
   }
+  
+  // Callback untuk navigate ke tab tertentu dari child pages
+  void navigateToTab(int index) {
+    _onItemTapped(index);
+  }
 
   @override
   Widget build(BuildContext context) {

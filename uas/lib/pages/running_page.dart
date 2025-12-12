@@ -25,8 +25,8 @@ class _RunningPageState extends State<RunningPage> {
   Set<Polyline> _polylines = {};
   double _currentLat = -6.200000; // Default: Jakarta
   double _currentLng = 106.816666;
-  double _lastTrackedLat = 0;
-  double _lastTrackedLng = 0;
+  double _lastTrackedLat = -6.200000; // Initialize with default Jakarta
+  double _lastTrackedLng = 106.816666; // Initialize with default Jakarta
   StreamSubscription<Position>? _positionStream;
   TrackingSession? _currentSession;
   List<LatLng> _routePoints = [];
@@ -238,14 +238,43 @@ class _RunningPageState extends State<RunningPage> {
         });
       });
     } else {
+      // Pause - jangan save session, hanya stop timer dan GPS
       _timer.cancel();
       _positionStream?.cancel();
-      _endRunning();
+    }
+  }
+
+  Future<void> _finishRunning() async {
+    // Stop tracking
+    setState(() {
+      _isRunning = false;
+    });
+    _timer.cancel();
+    _positionStream?.cancel();
+    
+    // Save session
+    await _endRunning();
+    
+    // Reset UI
+    setState(() {
       _distance = 0;
       _speed = 0;
       _elapsedSeconds = 0;
       _polylines = {};
       _routePoints = [];
+    });
+    
+    // Pop back to MainApp
+    if (mounted) {
+      // Navigate back to MainApp using PopAndPushNamed or just pop
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Session saved! Tap Profile to see details.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -385,6 +414,26 @@ class _RunningPageState extends State<RunningPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 24),
+
+                  // Finish Button (only show if running)
+                  if (_isRunning)
+                    SizedBox(
+                      width: 200,
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: _finishRunning,
+                        icon: const Icon(Icons.check_circle, size: 24),
+                        label: const Text('Finish'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade600,
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
