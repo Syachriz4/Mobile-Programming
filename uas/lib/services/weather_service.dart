@@ -17,7 +17,7 @@ class WeatherService {
     try {
       final uri = Uri.parse(
         '$_baseUrl?latitude=$latitude&longitude=$longitude'
-        '&current=temperature_2m,humidity,weather_code,wind_speed_10m',
+        '&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m',
       );
 
       final response = await http.get(uri).timeout(

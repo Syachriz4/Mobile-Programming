@@ -51,10 +51,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<List<Activity>> loadActivities() async {
-    final String response =
-        await rootBundle.loadString('assets/data/activities.json');
-    final List<dynamic> data = jsonDecode(response);
-    return data.map((item) => Activity.fromJson(item)).toList();
+    try {
+      final String response =
+          await rootBundle.loadString('assets/data/activities.json');
+      final List<dynamic> data = jsonDecode(response);
+      return data.map((item) => Activity.fromJson(item)).toList();
+    } catch (e) {
+      print('Error loading activities: $e');
+      return [];
+    }
   }
 
   List<Activity> _filterActivities(List<Activity> activities) {

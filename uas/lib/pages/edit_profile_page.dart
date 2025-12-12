@@ -23,12 +23,31 @@ class _EditProfilePageState extends State<EditProfilePage> {
   File? _selectedImage;
   final ImagePicker _imagePicker = ImagePicker();
   bool _isSaving = false;
+  String _selectedLevel = 'Beginner';
+  
+  final List<String> _levelOptions = [
+    'Beginner',
+    'Intermediate',
+    'Advanced',
+    'Expert',
+    'Master',
+  ];
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName);
     _updateInitials();
+    _loadCurrentLevel();
+  }
+  
+  Future<void> _loadCurrentLevel() async {
+    final level = await UserService.getUserLevel();
+    if (mounted) {
+      setState(() {
+        _selectedLevel = level;
+      });
+    }
   }
 
   @override
@@ -102,12 +121,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
         initials: _avatarInitialsController.text,
         imagePath: _selectedImage?.path,
       );
+      
+      // Save level separately
+      await UserService.saveUserLevel(_selectedLevel);
 
       if (mounted) {
         Navigator.pop(context, {
           'name': _nameController.text,
           'initials': _avatarInitialsController.text,
           'imagePath': _selectedImage?.path,
+          'level': _selectedLevel,
         });
       }
     } catch (e) {
@@ -122,6 +145,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _isSaving = false;
         });
       }
+    }
+  }
+
+  String _getLevelEmoji(String level) {
+    switch (level) {
+      case 'Beginner':
+        return '🌱';
+      case 'Intermediate':
+        return '🔥';
+      case 'Advanced':
+        return '⚡';
+      case 'Expert':
+        return '👑';
+      case 'Master':
+        return '💎';
+      default:
+        return '🌱';
     }
   }
 
@@ -279,7 +319,73 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ),
               const SizedBox(height: 24),
 
-              // Avatar Initials Preview
+              // Level Selection Section
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Level',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.indigo.withOpacity(0.3),
+                      ),
+                      color: Colors.indigo.withOpacity(0.05),
+                    ),
+                    child: DropdownButton<String>(
+                      value: _selectedLevel,
+                      onChanged: (String? newLevel) {
+                        if (newLevel != null) {
+                          setState(() {
+                            _selectedLevel = newLevel;
+                          });
+                        }
+                      },
+                      isExpanded: true,
+                      underline: const SizedBox(),
+                      dropdownColor: const Color(0xFF1A1E2E),
+                      items: _levelOptions.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 12),
+                            child: Row(
+                              children: [
+                                Text(
+                                  _getLevelEmoji(value),
+                                  style: const TextStyle(fontSize: 20),
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  value,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      icon: const Icon(
+                        Icons.arrow_drop_down,
+                        color: Color(0xFF6366F1),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(

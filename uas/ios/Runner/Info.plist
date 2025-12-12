@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- Location permissions for Geolocator and Google Maps -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs your location to show you on the map during activities.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app needs your location to show you on the map during activities.</string>
 </dict>
 </plist>
